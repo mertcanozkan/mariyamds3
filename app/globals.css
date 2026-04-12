@@ -1,0 +1,330 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 222 63% 15%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 16% 47%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 214 32% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 37 90% 55%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 222 63% 15%;
+    --radius: 0.5rem;
+
+    /* Gradient helpers for hero (Midnight default) */
+    --theme-from: #0F1F3D;
+    --theme-mid:  #1a3560;
+    --theme-to:   #0d1b38;
+    --theme-accent-hex: #F5A623;
+    --theme-accent-glow: rgba(245, 166, 35, 0.18);
+    --theme-accent-subtle: rgba(245, 166, 35, 0.08);
+  }
+
+  .dark {
+    --background: 222 47% 7%;
+    --foreground: 213 31% 91%;
+    --card: 222 47% 10%;
+    --card-foreground: 213 31% 91%;
+    --popover: 222 47% 10%;
+    --popover-foreground: 213 31% 91%;
+    --primary: 37 90% 55%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 215 28% 17%;
+    --secondary-foreground: 213 31% 91%;
+    --muted: 215 28% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 37 90% 55%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 213 31% 91%;
+    --border: 215 28% 17%;
+    --input: 215 28% 17%;
+    --ring: 37 90% 55%;
+  }
+}
+
+/* ============================================================
+   COLOUR THEMES — override primary + accent per scheme
+   All selectors come AFTER :root so they win on specificity tie
+   ============================================================ */
+
+/* 1. Midnight (default — matches :root, explicit for toggle) */
+[data-theme="midnight"] {
+  --primary: 222 63% 15%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 37 90% 55%;
+  --accent-foreground: 222 47% 11%;
+  --ring: 222 63% 15%;
+  --theme-from: #0F1F3D;
+  --theme-mid:  #1a3560;
+  --theme-to:   #0d1b38;
+  --theme-accent-hex: #F5A623;
+  --theme-accent-glow: rgba(245, 166, 35, 0.18);
+  --theme-accent-subtle: rgba(245, 166, 35, 0.08);
+}
+
+/* 2. Emerald — forest green + antique gold */
+[data-theme="emerald"] {
+  --primary: 158 66% 14%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 44 78% 46%;
+  --accent-foreground: 158 66% 10%;
+  --ring: 158 66% 14%;
+  --theme-from: #0D3B2E;
+  --theme-mid:  #1a5c45;
+  --theme-to:   #0a2e23;
+  --theme-accent-hex: #D4A017;
+  --theme-accent-glow: rgba(212, 160, 23, 0.18);
+  --theme-accent-subtle: rgba(212, 160, 23, 0.08);
+}
+
+/* 3. Crimson — deep burgundy + warm coral */
+[data-theme="crimson"] {
+  --primary: 0 55% 23%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 15 87% 63%;
+  --accent-foreground: 0 55% 15%;
+  --ring: 0 55% 23%;
+  --theme-from: #5C1A1A;
+  --theme-mid:  #7a2323;
+  --theme-to:   #4a1414;
+  --theme-accent-hex: #F4845F;
+  --theme-accent-glow: rgba(244, 132, 95, 0.18);
+  --theme-accent-subtle: rgba(244, 132, 95, 0.08);
+}
+
+/* 4. Ocean — deep teal + vivid coral-orange */
+[data-theme="ocean"] {
+  --primary: 196 68% 17%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 11 100% 62%;
+  --accent-foreground: 196 68% 10%;
+  --ring: 196 68% 17%;
+  --theme-from: #0D3B4A;
+  --theme-mid:  #1a5c72;
+  --theme-to:   #0a2e3a;
+  --theme-accent-hex: #FF6B4A;
+  --theme-accent-glow: rgba(255, 107, 74, 0.18);
+  --theme-accent-subtle: rgba(255, 107, 74, 0.08);
+}
+
+/* 5. Slate — charcoal + electric blue */
+[data-theme="slate"] {
+  --primary: 240 28% 14%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 218 91% 64%;
+  --accent-foreground: 240 28% 8%;
+  --ring: 218 91% 64%;
+  --theme-from: #1A1A2E;
+  --theme-mid:  #252549;
+  --theme-to:   #131323;
+  --theme-accent-hex: #4F8EF7;
+  --theme-accent-glow: rgba(79, 142, 247, 0.18);
+  --theme-accent-subtle: rgba(79, 142, 247, 0.08);
+}
+
+/* 6. Plum — deep violet + spearmint */
+[data-theme="plum"] {
+  --primary: 252 57% 26%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 161 61% 52%;
+  --accent-foreground: 252 57% 12%;
+  --ring: 161 61% 52%;
+  --theme-from: #2D1B69;
+  --theme-mid:  #3d2480;
+  --theme-to:   #231556;
+  --theme-accent-hex: #39D0A0;
+  --theme-accent-glow: rgba(57, 208, 160, 0.18);
+  --theme-accent-subtle: rgba(57, 208, 160, 0.08);
+}
+
+/* 7. Rose Gold — deep rose + champagne */
+[data-theme="rose-gold"] {
+  --primary: 330 37% 23%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 25 52% 62%;
+  --accent-foreground: 330 37% 14%;
+  --ring: 330 37% 23%;
+  --theme-from: #4A2035;
+  --theme-mid:  #612843;
+  --theme-to:   #3a1929;
+  --theme-accent-hex: #D4A27A;
+  --theme-accent-glow: rgba(212, 162, 122, 0.20);
+  --theme-accent-subtle: rgba(212, 162, 122, 0.08);
+}
+
+/* 8. Nordic — steel blue + acid lime */
+[data-theme="nordic"] {
+  --primary: 206 38% 18%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 79 57% 55%;
+  --accent-foreground: 206 38% 8%;
+  --ring: 79 57% 55%;
+  --theme-from: #1B2D40;
+  --theme-mid:  #243d56;
+  --theme-to:   #142231;
+  --theme-accent-hex: #A8D455;
+  --theme-accent-glow: rgba(168, 212, 85, 0.18);
+  --theme-accent-subtle: rgba(168, 212, 85, 0.07);
+}
+
+/* 9. Obsidian — near-black + vivid orange */
+[data-theme="obsidian"] {
+  --primary: 0 0% 9%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 18 100% 56%;
+  --accent-foreground: 0 0% 6%;
+  --ring: 18 100% 56%;
+  --theme-from: #171717;
+  --theme-mid:  #252525;
+  --theme-to:   #0e0e0e;
+  --theme-accent-hex: #FF5A1F;
+  --theme-accent-glow: rgba(255, 90, 31, 0.22);
+  --theme-accent-subtle: rgba(255, 90, 31, 0.08);
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    /* Smooth colour transition when switching themes */
+    color-scheme: light;
+  }
+
+  body {
+    @apply bg-background text-foreground font-dm;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    transition: background-color 0.35s ease, color 0.2s ease;
+  }
+
+  h1, h2, h3 {
+    @apply font-playfair;
+  }
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Theme-aware hero gradient — replaces static gradient-navy */
+  .gradient-hero {
+    background:
+      radial-gradient(ellipse 70% 60% at 80% 20%, var(--theme-accent-glow) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 10% 80%, rgba(255,255,255,0.04) 0%, transparent 60%),
+      linear-gradient(135deg, var(--theme-from) 0%, var(--theme-mid) 55%, var(--theme-to) 100%);
+    transition: background 0.35s ease;
+  }
+
+  /* Legacy alias — keeps existing component code working */
+  .gradient-navy {
+    background:
+      radial-gradient(ellipse 70% 60% at 80% 20%, var(--theme-accent-glow) 0%, transparent 65%),
+      linear-gradient(135deg, var(--theme-from) 0%, var(--theme-mid) 55%, var(--theme-to) 100%);
+    transition: background 0.35s ease;
+  }
+
+  .gradient-amber {
+    background: linear-gradient(135deg, var(--theme-accent-hex) 0%, color-mix(in srgb, var(--theme-accent-hex) 70%, white) 100%);
+  }
+
+  /* Glassmorphism card */
+  .glass {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  /* Gradient text using accent colours */
+  .text-gradient-accent {
+    background: linear-gradient(135deg, var(--theme-accent-hex) 0%, color-mix(in srgb, var(--theme-accent-hex) 60%, white) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .noise-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Theme transition helper — apply to containers to animate colour changes */
+  .theme-transition {
+    transition:
+      background-color 0.35s ease,
+      border-color 0.35s ease,
+      color 0.2s ease,
+      fill 0.35s ease,
+      stroke 0.35s ease;
+  }
+
+  /* Testimonial marquee — uses the tailwind `animate-marquee` class */
+  .pause-marquee:hover .inner-marquee {
+    animation-play-state: paused;
+  }
+
+  /* Section divider wave */
+  .wave-divider {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    line-height: 0;
+  }
+
+  /* Inline shimmer for loading states */
+  .shimmer-bg {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--border)) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+
+  /* Accent-tinted section bg */
+  .section-tinted {
+    background: linear-gradient(
+      180deg,
+      hsl(var(--background)) 0%,
+      hsl(var(--accent) / 0.03) 100%
+    );
+  }
+}
