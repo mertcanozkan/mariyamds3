@@ -50,7 +50,7 @@ export default function ResetPasswordPage() {
       <VideoBackground videoUrl="https://videos.pexels.com/video-files/8128311/8128311-uhd_2560_1440_25fps.mp4" />
 
       <div className="relative z-20 w-full max-w-md animate-fade-in">
-        <div className="p-8 rounded-2xl backdrop-blur-md bg-black/50 border border-white/10 shadow-2xl">
+        <div className="p-8 rounded-2xl backdrop-blur-xl bg-black/55 border border-white/12 shadow-2xl shadow-black/60">
 
           {status === "success" ? (
             <div className="text-center py-4 space-y-4">
@@ -169,7 +169,7 @@ function InvalidLink() {
     <div className="relative min-h-screen w-full flex items-center justify-center px-4 py-12">
       <VideoBackground videoUrl="https://videos.pexels.com/video-files/8128311/8128311-uhd_2560_1440_25fps.mp4" />
       <div className="relative z-20 w-full max-w-md">
-        <div className="p-8 rounded-2xl backdrop-blur-md bg-black/50 border border-white/10 shadow-2xl text-center space-y-4">
+        <div className="p-8 rounded-2xl backdrop-blur-xl bg-black/55 border border-white/12 shadow-2xl shadow-black/60 text-center space-y-4">
           <XCircle className="h-12 w-12 text-red-400 mx-auto" />
           <h1 className="font-playfair text-2xl font-semibold text-white">Invalid link</h1>
           <p className="text-white/50 text-sm">
