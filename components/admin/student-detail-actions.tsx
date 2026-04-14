@@ -35,7 +35,10 @@ export function StudentDetailActions({ student }: Props) {
   async function handleDelete() {
     const res = await fetch(`/api/admin/students/${student.id}`, { method: "DELETE" });
     const json = await res.json();
-    if (!res.ok) throw new Error(json.error ?? "Delete failed");
+    if (!res.ok) {
+      toast({ title: "Cannot delete student", description: json.error ?? "Delete failed.", variant: "destructive" });
+      return;
+    }
     toast({ title: "Student deleted" });
     router.push("/admin/students");
   }

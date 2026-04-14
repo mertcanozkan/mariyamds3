@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Jost, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import Script from "next/script";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Providers } from "@/components/providers";
+import { cookies } from "next/headers";
+import type { ThemeName } from "@/components/theme-provider";
+
+const VALID_THEMES: ThemeName[] = [
+  "midnight","emerald","crimson","ocean","slate","plum","rose-gold","nordic","obsidian",
+];
 
 const playfair = Cormorant_Garamond({
   subsets: ["latin"],
@@ -62,22 +67,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const themeCookie = cookieStore.get("mds-theme")?.value as ThemeName | undefined;
+  const theme: ThemeName = themeCookie && VALID_THEMES.includes(themeCookie) ? themeCookie : "midnight";
+
   return (
     <html
       lang="en"
+      data-theme={theme}
       suppressHydrationWarning
       className={`${playfair.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}
     >
       <body>
-        {/* Prevent flash of wrong theme — runs before hydration */}
-        <Script id="theme-init" strategy="beforeInteractive">{`(function(){try{var t=localStorage.getItem('mds-theme');var v=['midnight','emerald','crimson','ocean','slate','plum','rose-gold','nordic','obsidian'];if(t&&v.includes(t)){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();`}</Script>
         <Providers>
-          <ThemeProvider>
+          <ThemeProvider initialTheme={theme}>
             {children}
             <Toaster />
           </ThemeProvider>

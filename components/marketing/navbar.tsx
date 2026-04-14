@@ -17,6 +17,7 @@ const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Courses", href: "/courses" },
   { label: "About", href: "/about" },
+  { label: "Work With Us", href: "/work-with-us" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
 ];
@@ -62,6 +63,10 @@ function UserMenu() {
 
   if (!user) return null;
 
+  const isInstructor = user.role === "instructor";
+  const dashboardHref = isInstructor ? "/instructor/dashboard" : "/dashboard";
+  const profileHref   = isInstructor ? "/instructor/profile"   : "/dashboard/profile";
+
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
@@ -102,7 +107,7 @@ function UserMenu() {
           <div className="p-1.5 space-y-0.5">
             <DropdownMenu.Item asChild>
               <Link
-                href="/dashboard"
+                href={dashboardHref}
                 className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/80 hover:text-white hover:bg-white/10 focus:text-white focus:bg-white/10 focus:outline-none cursor-pointer transition-colors"
               >
                 <LayoutDashboard className="h-4 w-4 text-accent flex-shrink-0" />
@@ -112,7 +117,7 @@ function UserMenu() {
 
             <DropdownMenu.Item asChild>
               <Link
-                href="/dashboard/profile"
+                href={profileHref}
                 className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/80 hover:text-white hover:bg-white/10 focus:text-white focus:bg-white/10 focus:outline-none cursor-pointer transition-colors"
               >
                 <User className="h-4 w-4 text-accent flex-shrink-0" />
@@ -144,6 +149,9 @@ export function Navbar() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const isLoggedIn = status === "authenticated";
+  const isInstructor  = session?.user?.role === "instructor";
+  const dashboardHref = isInstructor ? "/instructor/dashboard" : "/dashboard";
+  const profileHref   = isInstructor ? "/instructor/profile"   : "/dashboard/profile";
 
   const isTransparent = !scrolled && pathname === "/";
 
@@ -170,12 +178,21 @@ export function Navbar() {
         <ul className="hidden md:flex items-center gap-0.5 flex-1 justify-center">
           {NAV_LINKS.map((link) => (
             <li key={link.href}>
-              <Link
-                href={link.href}
-                className="px-3 py-2 text-white/80 hover:text-white text-sm font-medium transition-colors rounded-lg hover:bg-white/10"
-              >
-                {link.label}
-              </Link>
+              {link.href === "/work-with-us" ? (
+                <Link
+                  href={link.href}
+                  className="px-3 py-1.5 text-amber text-sm font-semibold transition-colors rounded-lg hover:bg-amber/10 border border-amber/30 hover:border-amber/60"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <Link
+                  href={link.href}
+                  className="px-3 py-2 text-white/80 hover:text-white text-sm font-medium transition-colors rounded-lg hover:bg-white/10"
+                >
+                  {link.label}
+                </Link>
+              )}
             </li>
           ))}
         </ul>
@@ -239,7 +256,12 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="block px-4 py-2.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors text-sm font-medium"
+                  className={cn(
+                    "block px-4 py-2.5 rounded-lg transition-colors text-sm font-medium",
+                    link.href === "/work-with-us"
+                      ? "text-amber hover:bg-amber/10 border border-amber/20 hover:border-amber/40"
+                      : "text-white/80 hover:text-white hover:bg-white/10"
+                  )}
                 >
                   {link.label}
                 </Link>
@@ -249,7 +271,7 @@ export function Navbar() {
                 {isLoggedIn ? (
                   <>
                     <Link
-                      href="/dashboard"
+                      href={dashboardHref}
                       onClick={() => setMobileOpen(false)}
                       className="flex items-center gap-3 px-4 py-2.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors text-sm font-medium"
                     >
@@ -257,7 +279,7 @@ export function Navbar() {
                       Dashboard
                     </Link>
                     <Link
-                      href="/dashboard/profile"
+                      href={profileHref}
                       onClick={() => setMobileOpen(false)}
                       className="flex items-center gap-3 px-4 py-2.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors text-sm font-medium"
                     >

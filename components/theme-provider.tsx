@@ -45,31 +45,42 @@ const ThemeContext = createContext<ThemeContextValue>({
   setTheme: () => {},
 });
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeName>("midnight");
-
-  // Sync from localStorage on first mount (SSR-safe)
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY) as ThemeName | null;
-      if (stored && VALID_NAMES.includes(stored)) {
-        setThemeState(stored);
-        document.documentElement.setAttribute("data-theme", stored);
-      }
-    } catch {
-      // localStorage not available
-    }
-  }, []);
+export function ThemeProvider({
+  children,
+  initialTheme = "midnight",
+}: {
+  children: React.ReactNode;
+  initialTheme?: ThemeName;
+}) {
+  const [theme, setThemeState] = useState<ThemeName>(initialTheme);
 
   const setTheme = (t: ThemeName) => {
     setThemeState(t);
     document.documentElement.setAttribute("data-theme", t);
     try {
       localStorage.setItem(STORAGE_KEY, t);
+      // Also persist to cookie so the server can read it on next request
+      document.cookie = `${STORAGE_KEY}=${t}; path=/; max-age=31536000; SameSite=Lax`;
     } catch {
-      // localStorage not available
+      // storage not available
     }
   };
+
+  // On first client mount, reconcile localStorage → cookie if they differ
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY) as ThemeName | null;
+      if (stored && VALID_NAMES.includes(stored) && stored !== theme) {
+        setTheme(stored);
+      } else if (!document.cookie.includes(STORAGE_KEY)) {
+        // Ensure cookie exists for future SSR requests
+        document.cookie = `${STORAGE_KEY}=${theme}; path=/; max-age=31536000; SameSite=Lax`;
+      }
+    } catch {
+      // storage not available
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>

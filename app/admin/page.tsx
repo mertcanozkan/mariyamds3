@@ -1,5 +1,7 @@
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { users, bookings, payments, studentProfiles } from "@/lib/db/schema";
+import { users, bookings, payments, studentProfiles, adminProfiles } from "@/lib/db/schema";
 import { eq, count, sum, gte, desc } from "drizzle-orm";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +18,14 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default async function AdminOverviewPage() {
+  const session = await auth();
+  if (session?.user) {
+    const profile = await db.query.adminProfiles.findFirst({
+      where: eq(adminProfiles.userId, session.user.id),
+    });
+    if (!profile) redirect("/admin/setup");
+  }
+
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -88,7 +98,7 @@ export default async function AdminOverviewPage() {
                   {booking.student.firstName} {booking.student.lastName}
                 </div>
                 <div className="text-xs text-muted-foreground mt-0.5">
-                  {formatDateTime(booking.scheduledAt)} · {booking.instructor.firstName} {booking.instructor.lastName}
+                  {formatDateTime(booking.scheduledAt)} · {booking.instructor ? `${booking.instructor.firstName} ${booking.instructor.lastName}` : "Unassigned"}
                 </div>
               </div>
               <Badge

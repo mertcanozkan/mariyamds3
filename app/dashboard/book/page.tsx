@@ -12,7 +12,7 @@ export default async function BookPage() {
   const profile = await db.query.studentProfiles.findFirst({
     where: eq(studentProfiles.userId, session.user.id),
   });
-  if (!profile) redirect("/register");
+  if (!profile) redirect("/register/student");
 
   const [activeCourses, activeInstructors] = await Promise.all([
     db.query.courses.findMany({

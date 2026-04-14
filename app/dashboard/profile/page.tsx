@@ -9,10 +9,12 @@ export default async function ProfilePage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
+  if (session.user.role === "instructor") redirect("/instructor/dashboard");
+
   const profile = await db.query.studentProfiles.findFirst({
     where: eq(studentProfiles.userId, session.user.id),
   });
-  if (!profile) redirect("/register");
+  if (!profile) redirect("/register/student");
 
   return (
     <div className="lg:pt-0 pt-14 max-w-2xl space-y-6">

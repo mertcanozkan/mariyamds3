@@ -44,6 +44,19 @@ export const registerStep3Schema = z.object({
   previousLessonsHours: z.coerce.number().min(0).optional(),
 });
 
+export const instructorStep2Schema = z.object({
+  firstName: z.string().min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters"),
+  phone: z
+    .string()
+    .regex(/^(\+44|0)[0-9]{10}$/, "Enter a valid UK phone number"),
+});
+
+export const instructorStep3Schema = z.object({
+  dvsaAdiNumber: z.string().min(1, "DVSA ADI number is required"),
+  bio: z.string().max(500, "Bio must be 500 characters or fewer").optional(),
+});
+
 export const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
@@ -62,6 +75,8 @@ export const resetPasswordSchema = z
     path: ["confirmPassword"],
   });
 
+export type InstructorStep2Input = z.infer<typeof instructorStep2Schema>;
+export type InstructorStep3Input = z.infer<typeof instructorStep3Schema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterStep1Input = z.infer<typeof registerStep1Schema>;
 export type RegisterStep2Input = z.infer<typeof registerStep2Schema>;

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { eq, count } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { instructors, users } from "@/lib/db/schema";
+import { instructors, users, bookings } from "@/lib/db/schema";
 import { z } from "zod";
 
 const updateSchema = z.object({
@@ -16,6 +16,7 @@ const updateSchema = z.object({
   availableTo: z.string().optional(),
   workingDays: z.array(z.number()).optional(),
   isActive: z.boolean().optional(),
+  pendingApproval: z.boolean().optional(),
 });
 
 export async function PATCH(
@@ -70,7 +71,24 @@ export async function DELETE(
       return NextResponse.json({ error: "Not found", code: "NOT_FOUND" }, { status: 404 });
     }
 
-    // Cascade: deleting the user cascades to the instructor row
+    // Block hard-delete if the instructor has any bookings — deleting would also
+    // destroy payment and lesson progress records linked to those bookings.
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(bookings)
+      .where(eq(bookings.instructorId, id));
+
+    if (total > 0) {
+      return NextResponse.json(
+        {
+          error: `This instructor has ${total} booking${total === 1 ? "" : "s"} on record and cannot be permanently deleted. Deactivate them instead to hide them from new bookings.`,
+          code: "HAS_BOOKINGS",
+        },
+        { status: 409 }
+      );
+    }
+
+    // No bookings — safe to hard-delete. Deleting the user cascades to the instructor row.
     await db.delete(users).where(eq(users.id, instructor.userId));
 
     return NextResponse.json({ success: true });

@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
               subject: "Booking Confirmed",
               react: BookingConfirmationEmail({
                 firstName: booking.student.firstName,
-                instructorName: `${booking.instructor.firstName} ${booking.instructor.lastName}`,
+                instructorName: booking.instructor ? `${booking.instructor.firstName} ${booking.instructor.lastName}` : "TBC",
                 scheduledAt: booking.scheduledAt,
                 durationMinutes: booking.durationMinutes,
                 locationPickup: booking.locationPickup,

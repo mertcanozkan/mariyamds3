@@ -47,14 +47,16 @@ export async function POST(req: NextRequest) {
 
     const hash = await bcrypt.hash(rawPassword, 12);
 
-    // Create user + profile in a transaction
-    const result = await db.transaction(async (tx) => {
-      const [user] = await tx
-        .insert(users)
-        .values({ email: email.toLowerCase(), passwordHash: hash, role: "student" })
-        .returning();
+    // neon-http does not support transactions — insert sequentially and
+    // clean up the user row if the profile insert fails.
+    const [user] = await db
+      .insert(users)
+      .values({ email: email.toLowerCase(), passwordHash: hash, role: "student" })
+      .returning();
 
-      const [profile] = await tx
+    let result: { user: typeof user; profile: unknown };
+    try {
+      const [profile] = await db
         .insert(studentProfiles)
         .values({
           userId: user.id,
@@ -71,9 +73,12 @@ export async function POST(req: NextRequest) {
           previousLessonsHours: previousLessonsHours || 0,
         })
         .returning();
-
-      return { user, profile };
-    });
+      result = { user, profile };
+    } catch (profileErr) {
+      // Roll back the user row so we don't leave an orphaned account
+      await db.delete(users).where(eq(users.id, user.id));
+      throw profileErr;
+    }
 
     // Send welcome email after responding
     after(async () => {

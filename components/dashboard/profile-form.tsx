@@ -42,13 +42,21 @@ export function ProfileForm({ profile, email }: Props) {
   const [saved, setSaved] = useState(false);
   const [avatarUrl, setAvatarUrl]     = useState<string | null>(profile.profilePhotoUrl ?? null);
   const [uploading, setUploading]     = useState(false);
+  const [avatarBust, setAvatarBust]   = useState(0);
   const fileInputRef                  = useRef<HTMLInputElement>(null);
 
   const initials = `${profile.firstName[0]}${profile.lastName[0]}`.toUpperCase();
-  // Use the proxy route for blob URLs so the private token stays server-side.
-  // For OAuth images the proxy redirects to the public URL directly.
-  const rawImage = avatarUrl ?? session?.user?.image ?? null;
-  const displayImage = rawImage ? "/api/profile/avatar-url" : null;
+
+  // Blob images must go through the proxy (private token stays server-side).
+  // OAuth images (Google etc.) are already public — use them directly so
+  // next/image doesn't have to follow a redirect from the proxy.
+  const isBlob = (url: string | null) => !!url?.includes("blob.vercel-storage.com");
+  const blobUrl    = isBlob(avatarUrl) ? avatarUrl : isBlob(session?.user?.image ?? null) ? session?.user?.image : null;
+  const oauthUrl   = !isBlob(avatarUrl) && !isBlob(session?.user?.image ?? null) ? (avatarUrl ?? session?.user?.image ?? null) : null;
+  // Proxy URL gets a bust param so next/image re-fetches after a new upload
+  const displayImage = blobUrl
+    ? `/api/profile/avatar-url${avatarBust ? `?t=${avatarBust}` : ""}`
+    : oauthUrl ?? null;
 
   async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -72,6 +80,7 @@ export function ProfileForm({ profile, email }: Props) {
 
       const { url } = await res.json();
       setAvatarUrl(url);
+      setAvatarBust(Date.now());
       // Push raw URL into JWT (used as a presence flag); display always goes via proxy
       await updateSession({ image: url });
       toast({ title: "Photo updated", description: "Your profile photo has been saved." });
@@ -135,6 +144,7 @@ export function ProfileForm({ profile, email }: Props) {
                     alt={`${profile.firstName} ${profile.lastName}`}
                     width={80}
                     height={80}
+                    unoptimized={displayImage.startsWith("/api/")}
                     className="w-full h-full object-cover"
                   />
                 ) : (

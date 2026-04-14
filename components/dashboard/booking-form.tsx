@@ -37,11 +37,27 @@ interface Props {
 export function BookingForm({ courses, instructors, studentId }: Props) {
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [lessonDate, setLessonDate] = useState("");
+  const [lessonTime, setLessonTime] = useState("");
 
   const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } = useForm<BookingInput>({
     resolver: zodResolver(bookingSchema),
     defaultValues: { studentId, durationMinutes: 60 },
   });
+
+  function handleDateChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const d = e.target.value;
+    setLessonDate(d);
+    if (d && lessonTime) setValue("scheduledAt", `${d}T${lessonTime}`);
+    else setValue("scheduledAt", "");
+  }
+
+  function handleTimeChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const t = e.target.value;
+    setLessonTime(t);
+    if (lessonDate && t) setValue("scheduledAt", `${lessonDate}T${t}`);
+    else setValue("scheduledAt", "");
+  }
 
   const selectedCourseId = watch("courseId");
   const selectedInstructorId = watch("instructorId");
@@ -152,12 +168,25 @@ export function BookingForm({ courses, instructors, studentId }: Props) {
         {errors.instructorId && <p className="text-destructive text-xs">{errors.instructorId.message}</p>}
       </div>
 
-      {/* Date / Time */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Date / Time / Duration */}
+      <input type="hidden" {...register("scheduledAt")} />
+      <div className="grid grid-cols-3 gap-3">
         <div className="space-y-2">
           <Label>Date</Label>
-          <Input type="date" min={new Date().toISOString().split("T")[0]} {...register("scheduledAt")} />
-          {errors.scheduledAt && <p className="text-destructive text-xs">{errors.scheduledAt.message}</p>}
+          <Input
+            type="date"
+            min={new Date().toISOString().split("T")[0]}
+            value={lessonDate}
+            onChange={handleDateChange}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Time</Label>
+          <Input
+            type="time"
+            value={lessonTime}
+            onChange={handleTimeChange}
+          />
         </div>
         <div className="space-y-2">
           <Label>Duration</Label>
@@ -171,6 +200,7 @@ export function BookingForm({ courses, instructors, studentId }: Props) {
           </select>
         </div>
       </div>
+      {errors.scheduledAt && <p className="text-destructive text-xs">{errors.scheduledAt.message}</p>}
 
       {/* Pickup location */}
       <div className="space-y-2">

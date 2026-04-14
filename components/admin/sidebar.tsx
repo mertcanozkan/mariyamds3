@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, Users, Calendar, BookOpen,
-  GraduationCap, CreditCard, Settings, LogOut, Menu, X, Tag,
+  GraduationCap, CreditCard, Settings, LogOut, Menu, X, Tag, Home,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -26,9 +26,10 @@ const NAV_ITEMS = [
 
 interface Props {
   user: { name?: string | null; email: string };
+  pendingInstructors?: number;
 }
 
-export function AdminSidebar({ user }: Props) {
+export function AdminSidebar({ user, pendingInstructors = 0 }: Props) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -52,6 +53,7 @@ export function AdminSidebar({ user }: Props) {
         {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
           const active =
             pathname === href || (href !== "/admin" && pathname.startsWith(href));
+          const badge = label === "Instructors" && pendingInstructors > 0 ? pendingInstructors : null;
           return (
             <Link
               key={href}
@@ -66,7 +68,12 @@ export function AdminSidebar({ user }: Props) {
               aria-current={active ? "page" : undefined}
             >
               <Icon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
-              {label}
+              <span className="flex-1">{label}</span>
+              {badge !== null && (
+                <span className="ml-auto min-w-[18px] h-[18px] rounded-full bg-amber text-navy text-[10px] font-bold flex items-center justify-center px-1 leading-none">
+                  {badge}
+                </span>
+              )}
             </Link>
           );
         })}
@@ -79,6 +86,15 @@ export function AdminSidebar({ user }: Props) {
           <span className="text-xs text-muted-foreground font-medium">Theme</span>
           <ThemeSwitcher variant="light" dropUp />
         </div>
+
+        {/* Back to website */}
+        <Link
+          href="/"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-muted transition-colors"
+        >
+          <Home className="h-4 w-4" aria-hidden="true" />
+          Back to Website
+        </Link>
 
         {/* Switch to student portal */}
         <Link

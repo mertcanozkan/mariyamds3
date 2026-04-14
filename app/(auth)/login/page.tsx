@@ -1,9 +1,15 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { VideoBackground, LoginForm } from "@/components/ui/gaming-login";
+
+function roleRedirect(role: string | undefined) {
+  if (role === "admin") return "/admin";
+  if (role === "instructor") return "/instructor/pending";
+  return "/dashboard";
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,11 +31,14 @@ export default function LoginPage() {
       throw new Error(result.error);
     }
 
-    router.push("/dashboard");
+    // Fetch the freshly-created session to read the role, then route accordingly
+    const session = await getSession();
+    router.push(roleRedirect(session?.user?.role));
     router.refresh();
   }
 
   function handleGoogleSignIn() {
+    // Google users are always students; complete-profile handles missing profile
     signIn("google", { callbackUrl: "/dashboard" });
   }
 

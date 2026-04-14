@@ -33,6 +33,9 @@ export const bookingStatusEnum = pgEnum("booking_status", [
   "completed",
   "cancelled",
   "no_show",
+  "change_requested",
+  "cancellation_requested",
+  "rescheduled",
 ]);
 
 export const lessonTypeEnum = pgEnum("lesson_type", [
@@ -151,7 +154,32 @@ export const instructors = pgTable("instructors", {
   availableFrom: time("available_from").notNull().default("08:00"),
   availableTo: time("available_to").notNull().default("18:00"),
   workingDays: integer("working_days").array().notNull().default([1, 2, 3, 4, 5]),
+  // Vehicle details
+  vehicleMake:           text("vehicle_make"),
+  vehicleModel:          text("vehicle_model"),
+  vehicleYear:           integer("vehicle_year"),
+  vehicleColour:         text("vehicle_colour"),
+  vehicleRegistration:   text("vehicle_registration"),
+  vehicleTransmission:   text("vehicle_transmission"),
+  // Insurance
+  insuranceProvider:     text("insurance_provider"),
+  insurancePolicyNumber: text("insurance_policy_number"),
+  insuranceExpiryDate:   date("insurance_expiry_date"),
+  insuranceDocumentUrl:  text("insurance_document_url"),
   isActive: boolean("is_active").notNull().default(true),
+  pendingApproval: boolean("pending_approval").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const adminProfiles = pgTable("admin_profiles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  phone: text("phone"),
+  title: text("title").notNull().default("School Administrator"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -177,7 +205,6 @@ export const bookings = pgTable("bookings", {
     .notNull()
     .references(() => studentProfiles.id, { onDelete: "cascade" }),
   instructorId: uuid("instructor_id")
-    .notNull()
     .references(() => instructors.id),
   courseId: uuid("course_id").references(() => courses.id),
   scheduledAt: timestamp("scheduled_at").notNull(),
@@ -189,7 +216,26 @@ export const bookings = pgTable("bookings", {
   studentNotes: text("student_notes"),
   cancellationReason: text("cancellation_reason"),
   cancelledAt: timestamp("cancelled_at"),
+  // Late-cancellation request — populated when status = 'cancellation_requested'
+  cancellationRequestedAt: timestamp("cancellation_requested_at"),
+  // Student-requested change fields — populated when status = 'change_requested'
+  proposedScheduledAt: timestamp("proposed_scheduled_at"),
+  proposedDurationMinutes: integer("proposed_duration_minutes"),
+  changeRequestNote: text("change_request_note"),
+  changeRequestedAt: timestamp("change_requested_at"),
+  rescheduledTo: timestamp("rescheduled_to"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const bookingRejections = pgTable("booking_rejections", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  bookingId: uuid("booking_id")
+    .notNull()
+    .references(() => bookings.id, { onDelete: "cascade" }),
+  instructorId: uuid("instructor_id")
+    .notNull()
+    .references(() => instructors.id, { onDelete: "cascade" }),
+  rejectedAt: timestamp("rejected_at").notNull().defaultNow(),
 });
 
 export const payments = pgTable("payments", {
@@ -262,9 +308,20 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     fields: [users.id],
     references: [instructors.userId],
   }),
+  adminProfile: one(adminProfiles, {
+    fields: [users.id],
+    references: [adminProfiles.userId],
+  }),
   accounts: many(accounts),
   sessions: many(sessions),
   passwordResetTokens: many(passwordResetTokens),
+}));
+
+export const adminProfilesRelations = relations(adminProfiles, ({ one }) => ({
+  user: one(users, {
+    fields: [adminProfiles.userId],
+    references: [users.id],
+  }),
 }));
 
 export const studentProfilesRelations = relations(studentProfiles, ({ one, many }) => ({
@@ -307,6 +364,17 @@ export const bookingsRelations = relations(bookings, ({ one }) => ({
   progress: one(lessonProgress, {
     fields: [bookings.id],
     references: [lessonProgress.bookingId],
+  }),
+}));
+
+export const bookingRejectionsRelations = relations(bookingRejections, ({ one }) => ({
+  booking: one(bookings, {
+    fields: [bookingRejections.bookingId],
+    references: [bookings.id],
+  }),
+  instructor: one(instructors, {
+    fields: [bookingRejections.instructorId],
+    references: [instructors.id],
   }),
 }));
 

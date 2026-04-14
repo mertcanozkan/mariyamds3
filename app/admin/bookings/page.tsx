@@ -7,13 +7,26 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { BookingStatusActions } from "@/components/admin/booking-status-actions";
+import { Clock } from "lucide-react";
 
 const STATUS_COLORS: Record<string, string> = {
   confirmed: "success",
   pending: "warning",
+  change_requested: "warning",
+  cancellation_requested: "warning",
   completed: "secondary",
   cancelled: "destructive",
   no_show: "destructive",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  confirmed: "Confirmed",
+  pending: "Pending",
+  change_requested: "Change Pending",
+  cancellation_requested: "Cancellation Pending",
+  completed: "Completed",
+  cancelled: "Cancelled",
+  no_show: "No Show",
 };
 
 interface Props {
@@ -45,7 +58,7 @@ export default async function AdminBookingsPage({ searchParams }: Props) {
   const total = totalResult[0]?.count ?? 0;
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  const STATUSES = ["pending", "confirmed", "completed", "cancelled", "no_show"];
+  const STATUSES = ["pending", "confirmed", "change_requested", "cancellation_requested", "completed", "cancelled", "no_show"];
 
   return (
     <div className="lg:pt-0 pt-14 space-y-5">
@@ -65,7 +78,7 @@ export default async function AdminBookingsPage({ searchParams }: Props) {
               variant={status === s ? "navy" : "secondary"}
               className="cursor-pointer capitalize"
             >
-              {s.replace("_", " ")}
+              {STATUS_LABELS[s] ?? s.replace("_", " ")}
             </Badge>
           </Link>
         ))}
@@ -77,17 +90,50 @@ export default async function AdminBookingsPage({ searchParams }: Props) {
             <div className="p-8 text-center text-muted-foreground text-sm">No bookings found</div>
           ) : (
             allBookings.map((booking) => (
-              <div key={booking.id} className="flex items-center gap-4 p-4">
+              <div key={booking.id} className="flex items-start gap-4 p-4">
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-sm text-navy">
                     {booking.student.firstName} {booking.student.lastName}
                   </div>
                   <div className="text-xs text-muted-foreground mt-0.5">
                     {formatDateTime(booking.scheduledAt)} · {booking.durationMinutes}min ·{" "}
-                    {booking.instructor.firstName} {booking.instructor.lastName}
+                    {booking.instructor ? `${booking.instructor.firstName} ${booking.instructor.lastName}` : "Unassigned"}
                   </div>
                   {booking.course && (
                     <div className="text-xs text-muted-foreground">{booking.course.name}</div>
+                  )}
+
+                  {/* Show cancellation request details */}
+                  {booking.status === "cancellation_requested" && (
+                    <div className="mt-1.5 inline-flex items-start gap-1.5 rounded-md bg-amber-50 border border-amber-200 px-2 py-1 text-xs text-amber-800">
+                      <Clock className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-amber-600" />
+                      <div>
+                        <span className="font-medium">Cancellation requested</span>
+                        {booking.cancellationReason && (
+                          <span className="italic text-amber-700 ml-1">&ldquo;{booking.cancellationReason}&rdquo;</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Show proposed change for change_requested bookings */}
+                  {booking.status === "change_requested" && booking.proposedScheduledAt && (
+                    <div className="mt-1.5 inline-flex items-start gap-1.5 rounded-md bg-amber-50 border border-amber-200 px-2 py-1 text-xs text-amber-800">
+                      <Clock className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-amber-600" />
+                      <div>
+                        <span className="font-medium">Requested: </span>
+                        {formatDateTime(booking.proposedScheduledAt)}
+                        {booking.proposedDurationMinutes &&
+                        booking.proposedDurationMinutes !== booking.durationMinutes
+                          ? ` · ${booking.proposedDurationMinutes} min`
+                          : ""}
+                        {booking.changeRequestNote && (
+                          <span className="italic text-amber-700 ml-1">
+                            &ldquo;{booking.changeRequestNote}&rdquo;
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
@@ -95,7 +141,7 @@ export default async function AdminBookingsPage({ searchParams }: Props) {
                     variant={STATUS_COLORS[booking.status] as "success" | "warning" | "secondary" | "destructive"}
                     className="capitalize"
                   >
-                    {booking.status.replace("_", " ")}
+                    {STATUS_LABELS[booking.status] ?? booking.status.replace("_", " ")}
                   </Badge>
                   <BookingStatusActions bookingId={booking.id} currentStatus={booking.status} />
                 </div>

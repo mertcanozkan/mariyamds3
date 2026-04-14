@@ -98,7 +98,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, onGoogleSignIn }
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full pl-10 pr-4 py-3 bg-white/6 border border-white/10 rounded-xl text-white placeholder-white/35 focus:outline-none focus:border-amber-400/50 focus:bg-white/8 transition-all duration-200 text-sm font-dm"
+            className="w-full pl-10 pr-4 py-3 bg-white/6 border border-white/10 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400/50 focus:bg-white/8 transition-all duration-200 text-sm font-dm [&:-webkit-autofill]:shadow-[inset_0_0_0_9999px_rgb(20,20,25)] [&:-webkit-autofill]:[-webkit-text-fill-color:#111827]"
           />
         </div>
 
@@ -113,7 +113,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, onGoogleSignIn }
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full pl-10 pr-11 py-3 bg-white/6 border border-white/10 rounded-xl text-white placeholder-white/35 focus:outline-none focus:border-amber-400/50 focus:bg-white/8 transition-all duration-200 text-sm font-dm"
+            className="w-full pl-10 pr-11 py-3 bg-white/6 border border-white/10 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400/50 focus:bg-white/8 transition-all duration-200 text-sm font-dm [&:-webkit-autofill]:shadow-[inset_0_0_0_9999px_rgb(20,20,25)] [&:-webkit-autofill]:[-webkit-text-fill-color:#111827]"
           />
           <button
             type="button"

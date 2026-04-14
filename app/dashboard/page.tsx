@@ -24,6 +24,9 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
+  // Instructors have their own area
+  if (session.user.role === "instructor") redirect("/instructor/dashboard");
+
   const [profile, dbUser] = await Promise.all([
     db.query.studentProfiles.findFirst({
       where: eq(studentProfiles.userId, session.user.id),
@@ -33,9 +36,11 @@ export default async function DashboardPage() {
       columns: { image: true },
     }),
   ]);
-  const avatarUrl = dbUser?.image ?? null;
+  // Route all avatar images through the proxy so private blob tokens stay server-side
+  // and OAuth images (Google) also benefit from a consistent URL
+  const avatarUrl = dbUser?.image ? "/api/profile/avatar-url" : null;
 
-  if (!profile) redirect("/register");
+  if (!profile) redirect("/register/student");
 
   // Parallel fetches — async-parallel rule
   const [upcomingBookings, recentPayments, progressRecords] = await Promise.all([
@@ -89,6 +94,7 @@ export default async function DashboardPage() {
                 width={56}
                 height={56}
                 className="w-14 h-14 rounded-full object-cover ring-2 ring-white/20"
+                unoptimized
               />
             ) : (
               <div className="w-14 h-14 rounded-full bg-white/10 ring-2 ring-white/20 flex items-center justify-center">
@@ -172,7 +178,7 @@ export default async function DashboardPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-navy text-sm">
-                      {booking.instructor.firstName} {booking.instructor.lastName}
+                      {booking.instructor ? `${booking.instructor.firstName} ${booking.instructor.lastName}` : "Instructor TBC"}
                     </div>
                     <div className="text-muted-foreground text-xs mt-0.5">
                       {formatDateTime(booking.scheduledAt)} · {booking.durationMinutes} min

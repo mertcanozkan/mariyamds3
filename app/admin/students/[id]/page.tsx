@@ -130,7 +130,7 @@ export default async function AdminStudentDetailPage({ params }: Props) {
                     {formatDateTime(booking.scheduledAt)} · {booking.durationMinutes}min
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {booking.instructor.firstName} {booking.instructor.lastName}
+                    {booking.instructor ? `${booking.instructor.firstName} ${booking.instructor.lastName}` : "Unassigned"}
                     {booking.course && ` · ${booking.course.name}`}
                   </div>
                 </div>

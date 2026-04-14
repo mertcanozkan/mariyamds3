@@ -154,6 +154,7 @@ export function ContactSection() {
                     <Label className="text-white/70 text-xs uppercase tracking-wider">Name</Label>
                     <input
                       placeholder="Your name"
+                      suppressHydrationWarning
                       {...register("name")}
                       className="flex w-full h-10 rounded-lg border border-white/15 bg-white/8 px-3 py-2 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent transition-colors"
                     />
@@ -165,6 +166,7 @@ export function ContactSection() {
                     <Label className="text-white/70 text-xs uppercase tracking-wider">Phone (optional)</Label>
                     <input
                       placeholder="07700…"
+                      suppressHydrationWarning
                       {...register("phone")}
                       className="flex w-full h-10 rounded-lg border border-white/15 bg-white/8 px-3 py-2 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent transition-colors"
                     />
@@ -176,6 +178,7 @@ export function ContactSection() {
                   <input
                     type="email"
                     placeholder="you@example.com"
+                    suppressHydrationWarning
                     {...register("email")}
                     className="flex w-full h-10 rounded-lg border border-white/15 bg-white/8 px-3 py-2 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent transition-colors"
                   />
@@ -188,6 +191,7 @@ export function ContactSection() {
                   <Label className="text-white/70 text-xs uppercase tracking-wider">Subject</Label>
                   <input
                     placeholder="How can we help?"
+                    suppressHydrationWarning
                     {...register("subject")}
                     className="flex w-full h-10 rounded-lg border border-white/15 bg-white/8 px-3 py-2 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent transition-colors"
                   />
@@ -200,6 +204,7 @@ export function ContactSection() {
                   <Label className="text-white/70 text-xs uppercase tracking-wider">Message</Label>
                   <textarea
                     {...register("message")}
+                    suppressHydrationWarning
                     placeholder="Tell us more…"
                     rows={4}
                     className="flex w-full rounded-lg border border-white/15 bg-white/8 px-3 py-2 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent resize-none transition-colors"
